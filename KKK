@@ -1,42 +1,17 @@
-tblDate =
-VAR MinD =
-    MINX (
-        UNION (
-            SELECTCOLUMNS (
-                'tblGLSummary (Telephone)',
-                "d", DATE ( 'tblGLSummary (Telephone)'[intYear], 'tblGLSummary (Telephone)'[intMonth], 1 )
-            ),
-            SELECTCOLUMNS (
-                'tblGLSummary (CLEC)',
-                "d", DATE ( 'tblGLSummary (CLEC)'[intYear], 'tblGLSummary (CLEC)'[intMonth], 1 )
-            ),
-            SELECTCOLUMNS ( 'tblGL (Telephone)', "d", 'tblGL (Telephone)'[dtmDate] ),
-            SELECTCOLUMNS ( 'tblGL (CLEC)', "d", 'tblGL (CLEC)'[dtmDate] )
-        ),
-        [d]
-    )
-VAR MaxD =
-    MAXX (
-        UNION (
-            SELECTCOLUMNS (
-                'tblGLSummary (Telephone)',
-                "d", DATE ( 'tblGLSummary (Telephone)'[intYear], 'tblGLSummary (Telephone)'[intMonth], 1 )
-            ),
-            SELECTCOLUMNS (
-                'tblGLSummary (CLEC)',
-                "d", DATE ( 'tblGLSummary (CLEC)'[intYear], 'tblGLSummary (CLEC)'[intMonth], 1 )
-            ),
-            SELECTCOLUMNS ( 'tblGL (Telephone)', "d", 'tblGL (Telephone)'[dtmDate] ),
-            SELECTCOLUMNS ( 'tblGL (CLEC)', "d", 'tblGL (CLEC)'[dtmDate] )
-        ),
-        [d]
-    )
+-- pick default audit year
+SelectedYear :=
+SELECTEDVALUE ( 'tblDate'[Year], 2024 )
+
+-- base net; flip the subtraction if signs look inverted vs audit
+Tel Net :=
+SUM ( 'tblGL (Telephone)'[dblDebit] ) - SUM ( 'tblGL (Telephone)'[dblCredit] )
+
+-- P&L for the year
+IS Amount (Telephone) :=
+CALCULATE ( [Tel Net], YEAR ( 'tblGL (Telephone)'[dtmDate] ) = [SelectedYear] )
+
+-- Balance at year end (cumulative through 12/31)
+BS Amount (Telephone) :=
+VAR YE := DATE ( [SelectedYear], 12, 31 )
 RETURN
-ADDCOLUMNS (
-    CALENDAR ( MinD, MaxD ),
-    "Year",        YEAR ( [Date] ),
-    "Month",       MONTH ( [Date] ),
-    "MonthName",   FORMAT ( [Date], "MMM" ),
-    "YearMonth",   YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
-    "EndOfMonth",  EOMONTH ( [Date], 0 )
-)
+CALCULATE ( [Tel Net], 'tblGL (Telephone)'[dtmDate] <= YE )

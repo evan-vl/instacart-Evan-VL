@@ -26,28 +26,34 @@ DATATABLE(
 )
 
 
--- Leaf value (already filtered to a single AuditGroup via the matrix row)
-IS Leaf (Tel) := [IS Base (Tel)]
+-- transaction sign
+NetAmount_Tel :=
+SUM ( 'tblGL (Telephone)'[dblDebit] ) - SUM ( 'tblGL (Telephone)'[dblCredit] )
 
--- Subtotals by type (ignores the current AuditGroup row but stays inside the selected Section/Year)
+-- leaf value for the matrix; respects the Year slicer
+IS Base (Tel) :=
+[NetAmount_Tel]
+
+-- section totals for the “bottom block”
 IS Revenues (Tel) :=
-CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Revenue" )
+CALCULATE ( [IS Base (Tel)], REMOVEFILTERS(tblAuditGroup), KEEPFILTERS( IS_Meta[LineType] = "Revenue" ) )
 
 IS Expenses (Tel) :=
-CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Expense" )
+CALCULATE ( [IS Base (Tel)], REMOVEFILTERS(tblAuditGroup), KEEPFILTERS( IS_Meta[LineType] = "Expense" ) )
 
 IS Other Income (Tel) :=
-CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "OtherIncome" )
+CALCULATE ( [IS Base (Tel)], REMOVEFILTERS(tblAuditGroup), KEEPFILTERS( IS_Meta[LineType] = "OtherIncome" ) )
 
 IS Income Tax (Tel) :=
-CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Tax" )
+CALCULATE ( [IS Base (Tel)], REMOVEFILTERS(tblAuditGroup), KEEPFILTERS( IS_Meta[LineType] = "Tax" ) )
 
--- Specific single line you’ll need for final net:
 IS Equity Earnings (Tel) :=
-CALCULATE ( [IS Base (Tel)], IS_Meta[AuditGroup] = "Equity Earnings of Subsidiary" )
+CALCULATE ( [IS Base (Tel)], REMOVEFILTERS(tblAuditGroup),
+            KEEPFILTERS( IS_Meta[AuditGroup] = "Equity Earnings of Subsidiary" ) )
 
--- Audit-style calculated lines:
-IS Operating Margin (Tel) := [IS Revenues (Tel)] - [IS Expenses (Tel)]
+-- audit-style calculations
+IS Operating Margin (Tel) :=
+[IS Revenues (Tel)] - [IS Expenses (Tel)]
 
 IS Margins Before Income Taxes (Tel) :=
 [IS Operating Margin (Tel)] + [IS Other Income (Tel)]

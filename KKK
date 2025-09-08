@@ -1,3 +1,30 @@
+IS_Meta =
+DATATABLE(
+    "AuditGroup", STRING,
+    "Section", STRING,
+    "LineType", STRING,
+    "SortOrder", INTEGER,
+    {
+        { "Local Network Services", "Operating Revenues", "Revenue", 1 },
+        { "Network Access Services", "Operating Revenues", "Revenue", 2 },
+        { "Long Distance Services", "Operating Revenues", "Revenue", 3 },
+        { "Internet, Sales and Other Services", "Operating Revenues", "Revenue", 4 },
+        { "Miscellaneous Revenue", "Operating Revenues", "Revenue", 5 },
+        { "Plant Specific Operations", "Operating Expenses", "Expense", 6 },
+        { "Plant Nonspecific Operations", "Operating Expenses", "Expense", 7 },
+        { "Cost of Long Distance Services", "Operating Expenses", "Expense", 8 },
+        { "Cost of Internet, Sales and Other Services", "Operating Expenses", "Expense", 9 },
+        { "Depreciation", "Operating Expenses", "Expense", 10 },
+        { "Customer Operations", "Operating Expenses", "Expense", 11 },
+        { "Corporate Operations", "Operating Expenses", "Expense", 12 },
+        { "General Taxes", "Operating Expenses", "Expense", 13 },
+        { "Interest and Dividend Income", "Other Income", "OtherIncome", 14 },
+        { "Earnings from Equity Method Investments", "Other Income", "OtherIncome", 15 },
+        { "Other, Net", "Other Income", "OtherIncome", 16 },
+        { "Income Tax Expense", "Income Taxes", "Tax", 17 }
+    }
+)
+
 
 -- Leaf value (already filtered to a single AuditGroup via the matrix row)
 IS Leaf (Tel) := [IS Base (Tel)]

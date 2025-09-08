@@ -87,17 +87,18 @@ UNION (
     )
 )
 
-IS Bottom Value (Tel) :=
-VAR line = SELECTEDVALUE ( IS_BottomLines[Line] )
+IS Value (Tel) :=
+VAR rowType = SELECTEDVALUE ( IS_DisplayRows[RowType] )
+VAR label   = SELECTEDVALUE ( IS_DisplayRows[Label] )
 RETURN
 SWITCH (
-    line,
-    "Operating Margins",                       [IS Operating Margin (Tel)],
-    "Margins Before Income Taxes",             [IS Margins Before Income Taxes (Tel)],
-    "Margins Before Equity Loss of Subsidiary",[IS Margins Before Equity Loss of Subsidiary (Tel)],
-    "Equity Earnings of Subsidiary",           [IS Equity Earnings (Tel)],
-    "Net Margins",                             [IS Net Margins (Tel)],
-    BLANK ()
+    TRUE(),
+    rowType = "Leaf", [IS Base (Tel)],
+    label = "Operating Margins",                        [IS Operating Margin (Tel)],
+    label = "Margins Before Income Taxes",              [IS Margins Before Income Taxes (Tel)],
+    label = "Margins Before Equity Loss of Subsidiary", [IS Margins Before Equity Loss of Subsidiary (Tel)],
+    label = "Equity Earnings of Subsidiary",            [IS Equity Earnings (Tel)],
+    label = "Net Margins",                              [IS Net Margins (Tel)],
+    BLANK()
 )
-
 

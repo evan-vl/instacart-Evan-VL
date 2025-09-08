@@ -63,3 +63,19 @@ IS Margins Before Equity Loss of Subsidiary (Tel) :=
 
 IS Net Margins (Tel) :=
 [IS Margins Before Equity Loss of Subsidiary (Tel)] + [IS Equity Earnings (Tel)]
+
+
+IS Bottom Value (Tel) :=
+VAR line = SELECTEDVALUE ( IS_BottomLines[Line] )
+RETURN
+SWITCH (
+    line,
+    "Operating Margins",                       [IS Operating Margin (Tel)],
+    "Margins Before Income Taxes",             [IS Margins Before Income Taxes (Tel)],
+    "Margins Before Equity Loss of Subsidiary",[IS Margins Before Equity Loss of Subsidiary (Tel)],
+    "Equity Earnings of Subsidiary",           [IS Equity Earnings (Tel)],
+    "Net Margins",                             [IS Net Margins (Tel)],
+    BLANK ()
+)
+
+

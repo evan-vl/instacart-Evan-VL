@@ -87,3 +87,44 @@ SWITCH (
     BLANK()
 )
 
+
+
+Unified table
+
+
+IS_DisplayRows =
+UNION (
+    SELECTCOLUMNS(
+        IS_Meta,
+        "RowType","Leaf",
+        "Label",   IS_Meta[AuditGroup],
+        "Sort",    IS_Meta[SortOrder]
+    ),
+    DATATABLE(
+        "RowType", STRING, "Label", STRING, "Sort", INTEGER,
+        {
+            { "Calc","Operating Margins", 101 },
+            { "Calc","Margins Before Income Taxes", 102 },
+            { "Calc","Income Tax Expense", 103 },  -- show again in the bottom block
+            { "Calc","Margins Before Equity Loss of Subsidiary", 104 },
+            { "Calc","Equity Earnings of Subsidiary", 105 },      -- show again
+            { "Calc","Net Margins", 106 }
+        }
+    )
+)
+IS Value_Tel =
+VAR lbl = SELECTEDVALUE ( IS_DisplayRows[Label] )
+VAR rowType = SELECTEDVALUE ( IS_DisplayRows[RowType] )
+RETURN
+SWITCH (
+    TRUE(),
+    rowType = "Leaf",                                  [IS Base_Tel],
+    lbl = "Operating Margins",                        [IS Operating Margin_Tel],
+    lbl = "Margins Before Income Taxes",              [IS Margins Before Income Taxes_Tel],
+    lbl = "Income Tax Expense",                       [IS Income Tax_Tel],
+    lbl = "Margins Before Equity Loss of Subsidiary", [IS Margins Before Equity Loss of Subsidiary_Tel],
+    lbl = "Equity Earnings of Subsidiary",            [IS Equity Earnings_Tel],
+    lbl = "Net Margins",                              [IS Net Margins_Tel],
+    BLANK()
+)
+

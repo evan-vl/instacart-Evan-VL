@@ -1,1 +1,32 @@
 
+-- Leaf value (already filtered to a single AuditGroup via the matrix row)
+IS Leaf (Tel) := [IS Base (Tel)]
+
+-- Subtotals by type (ignores the current AuditGroup row but stays inside the selected Section/Year)
+IS Revenues (Tel) :=
+CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Revenue" )
+
+IS Expenses (Tel) :=
+CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Expense" )
+
+IS Other Income (Tel) :=
+CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "OtherIncome" )
+
+IS Income Tax (Tel) :=
+CALCULATE ( [IS Base (Tel)], IS_Meta[LineType] = "Tax" )
+
+-- Specific single line you’ll need for final net:
+IS Equity Earnings (Tel) :=
+CALCULATE ( [IS Base (Tel)], IS_Meta[AuditGroup] = "Equity Earnings of Subsidiary" )
+
+-- Audit-style calculated lines:
+IS Operating Margin (Tel) := [IS Revenues (Tel)] - [IS Expenses (Tel)]
+
+IS Margins Before Income Taxes (Tel) :=
+[IS Operating Margin (Tel)] + [IS Other Income (Tel)]
+
+IS Margins Before Equity Loss of Subsidiary (Tel) :=
+[IS Margins Before Income Taxes (Tel)] - [IS Income Tax (Tel)]
+
+IS Net Margins (Tel) :=
+[IS Margins Before Equity Loss of Subsidiary (Tel)] + [IS Equity Earnings (Tel)]

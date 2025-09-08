@@ -65,40 +65,16 @@ IS Net Margins (Tel) :=
 [IS Margins Before Equity Loss of Subsidiary (Tel)] + [IS Equity Earnings (Tel)]
 
 
-
-IS_DisplayRows =
-UNION (
-    SELECTCOLUMNS(
-        IS_Meta,
-        "RowType", "Leaf",
-        "Section", IS_Meta[Section],
-        "Label",   IS_Meta[AuditGroup],
-        "Sort",    IS_Meta[SortOrder]
-    ),
-    DATATABLE(
-        "RowType", STRING, "Section", STRING, "Label", STRING, "Sort", INTEGER,
-        {
-            { "Calc", "", "Operating Margins", 101 },
-            { "Calc", "", "Margins Before Income Taxes", 102 },
-            { "Calc", "", "Margins Before Equity Loss of Subsidiary", 103 },
-            { "Calc", "", "Equity Earnings of Subsidiary", 104 },
-            { "Calc", "", "Net Margins", 105 }
-        }
-    )
-)
-
-IS Value (Tel) :=
-VAR rowType = SELECTEDVALUE ( IS_DisplayRows[RowType] )
-VAR label   = SELECTEDVALUE ( IS_DisplayRows[Label] )
+IS BottomValues_Tel :=
+VAR lbl = SELECTEDVALUE ( IS_BottomRows[Label] )
 RETURN
 SWITCH (
-    TRUE(),
-    rowType = "Leaf", [IS Base (Tel)],
-    label = "Operating Margins",                        [IS Operating Margin (Tel)],
-    label = "Margins Before Income Taxes",              [IS Margins Before Income Taxes (Tel)],
-    label = "Margins Before Equity Loss of Subsidiary", [IS Margins Before Equity Loss of Subsidiary (Tel)],
-    label = "Equity Earnings of Subsidiary",            [IS Equity Earnings (Tel)],
-    label = "Net Margins",                              [IS Net Margins (Tel)],
+    lbl,
+    "Operating Margins",                        [IS Operating Margin (Tel)],
+    "Margins Before Income Taxes",              [IS Margins Before Income Taxes (Tel)],
+    "Margins Before Equity Loss of Subsidiary", [IS Margins Before Equity Loss of Subsidiary (Tel)],
+    "Equity Earnings of Subsidiary",            [IS Equity Earnings (Tel)],
+    "Net Margins",                              [IS Net Margins (Tel)],
     BLANK()
 )
 

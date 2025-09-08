@@ -65,6 +65,28 @@ IS Net Margins (Tel) :=
 [IS Margins Before Equity Loss of Subsidiary (Tel)] + [IS Equity Earnings (Tel)]
 
 
+
+IS_DisplayRows =
+UNION (
+    SELECTCOLUMNS(
+        IS_Meta,
+        "RowType", "Leaf",
+        "Section", IS_Meta[Section],
+        "Label",   IS_Meta[AuditGroup],
+        "Sort",    IS_Meta[SortOrder]
+    ),
+    DATATABLE(
+        "RowType", STRING, "Section", STRING, "Label", STRING, "Sort", INTEGER,
+        {
+            { "Calc", "", "Operating Margins", 101 },
+            { "Calc", "", "Margins Before Income Taxes", 102 },
+            { "Calc", "", "Margins Before Equity Loss of Subsidiary", 103 },
+            { "Calc", "", "Equity Earnings of Subsidiary", 104 },
+            { "Calc", "", "Net Margins", 105 }
+        }
+    )
+)
+
 IS Bottom Value (Tel) :=
 VAR line = SELECTEDVALUE ( IS_BottomLines[Line] )
 RETURN

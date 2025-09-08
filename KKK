@@ -1,17 +1,1 @@
--- pick default audit year
-SelectedYear :=
-SELECTEDVALUE ( 'tblDate'[Year], 2024 )
 
--- base net; flip the subtraction if signs look inverted vs audit
-Tel Net :=
-SUM ( 'tblGL (Telephone)'[dblDebit] ) - SUM ( 'tblGL (Telephone)'[dblCredit] )
-
--- P&L for the year
-IS Amount (Telephone) :=
-CALCULATE ( [Tel Net], YEAR ( 'tblGL (Telephone)'[dtmDate] ) = [SelectedYear] )
-
--- Balance at year end (cumulative through 12/31)
-BS Amount (Telephone) :=
-VAR YE := DATE ( [SelectedYear], 12, 31 )
-RETURN
-CALCULATE ( [Tel Net], 'tblGL (Telephone)'[dtmDate] <= YE )

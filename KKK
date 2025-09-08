@@ -128,3 +128,41 @@ SWITCH (
     BLANK()
 )
 
+
+
+
+CONSOLIDATE
+// ---------- CONSOL (driven by components) ----------
+IS Base_Consol :=
+[IS Base_Tel] + [IS Base_CLEC] + [IS Base_Elims]
+
+IS Revenues_Consol :=
+[IS Revenues_Tel] + [IS Revenues_CLEC] + [IS Revenues_Elims]
+
+IS Expenses_Consol :=
+[IS Expenses_Tel] + [IS Expenses_CLEC] + [IS Expenses_Elims]
+
+IS Other Income_Consol :=
+[IS Other Income_Tel] + [IS Other Income_CLEC] + [IS Other Income_Elims]
+
+IS Income Tax_Consol :=
+[IS Income Tax_Tel] + [IS Income Tax_CLEC] + [IS Income Tax_Elims]
+
+IS Equity Earnings_Consol :=
+[IS Equity Earnings_Tel] + [IS Equity Earnings_CLEC] + [IS Equity Earnings_Elims]
+
+IS Operating Margin_Consol :=
+[IS Revenues_Consol] - [IS Expenses_Consol]
+
+IS Margins Before Income Taxes_Consol :=
+[IS Operating Margin_Consol] + [IS Other Income_Consol]
+
+IS Margins Before Equity Loss of Subsidiary_Consol :=
+[IS Margins Before Income Taxes_Consol] - [IS Income Tax_Consol]
+
+IS Net Margins_Consol :=
+[IS Margins Before Equity Loss of Subsidiary_Consol] + [IS Equity Earnings_Consol]
+
+
+
+

@@ -56,12 +56,18 @@ DATE ( SELECTEDVALUE ( tblDate[Year], 2024 ), 12, 31 )
 BS Base_Tel :=
 CALCULATE ( [NetAmount_Tel], 'tblGL (Telephone)'[dtmDate] <= [BS YearEnd_Tel] )
 
-BS Base_Tel :=
-VAR EndDate = [BS YearEnd_Tel]
-RETURN
-CALCULATE (
-    SUMX ( 'tblGL (Telephone)', 'tblGL (Telephone)'[dblDebit] - 'tblGL (Telephone)'[dblCredit] ),
-    FILTER ( ALL ( 'tblGL (Telephone)'[dtmDate] ), 'tblGL (Telephone)'[dtmDate] <= EndDate ),
-    'tblGL (Telephone)'[ysnUnposted] <> TRUE()
-)
-
+-- Telephone
+BS Display_Tel :=
+VAR base    = [BS Base_Tel]                            -- your life-to-date balance
+VAR section = SELECTEDVALUE( BS_Meta[Section] )
+VAR label   = SELECTEDVALUE( BS_Meta[AuditGroup] )
+VAR sign :=
+    SWITCH(
+        TRUE(),
+        section = "Liabilities",                      -1,     -- show liabilities positive
+        section = "Members' Equity" &&                -- AOCL should remain negative
+            label = "Accumulated Other Comprehensive Loss",  1,
+        section = "Members' Equity",                  -1,     -- flip the rest of equity to positive
+        1                                                    -- Assets unchanged
+    )
+RETURN base * sign

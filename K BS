@@ -55,3 +55,13 @@ BS YearEnd_Tel :=
 DATE ( SELECTEDVALUE ( tblDate[Year], 2024 ), 12, 31 )
 BS Base_Tel :=
 CALCULATE ( [NetAmount_Tel], 'tblGL (Telephone)'[dtmDate] <= [BS YearEnd_Tel] )
+
+BS Base_Tel :=
+VAR EndDate = [BS YearEnd_Tel]
+RETURN
+CALCULATE (
+    SUMX ( 'tblGL (Telephone)', 'tblGL (Telephone)'[dblDebit] - 'tblGL (Telephone)'[dblCredit] ),
+    FILTER ( ALL ( 'tblGL (Telephone)'[dtmDate] ), 'tblGL (Telephone)'[dtmDate] <= EndDate ),
+    'tblGL (Telephone)'[ysnUnposted] <> TRUE()
+)
+

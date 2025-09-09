@@ -49,3 +49,9 @@ DATATABLE (
         { "Members' Equity","Members' Equity","Margins Assignable",              307 }
     }
 )
+
+
+BS YearEnd_Tel :=
+DATE ( SELECTEDVALUE ( tblDate[Year], 2024 ), 12, 31 )
+BS Base_Tel :=
+CALCULATE ( [NetAmount_Tel], 'tblGL (Telephone)'[dtmDate] <= [BS YearEnd_Tel] )

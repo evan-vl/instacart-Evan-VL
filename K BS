@@ -1,0 +1,51 @@
+BS_Meta =
+DATATABLE (
+    "Section",    STRING,         -- Assets / Liabilities / Members' Equity
+    "Subsection", STRING,         -- e.g., Current Assets, Other Noncurrent Assets, PP&E, etc.
+    "AuditGroup", STRING,         -- must match strAccountGroupAlt1
+    "SortOrder",  INTEGER,        -- drives exact display order
+    {
+        // ===== ASSETS =====
+        { "Assets","Current Assets","Cash and Cash Equivalents",                 101 },
+        { "Assets","Current Assets","Certificates of Deposit",                   102 },
+        { "Assets","Current Assets","Debt Securities Held-to-Maturity",          103 },
+        { "Assets","Current Assets","AR - Due from Customers",                   104 },
+        { "Assets","Current Assets","AR - Network Access",                       105 },
+        { "Assets","Current Assets","AR - Affiliates",                           106 },
+        { "Assets","Current Assets","AR - Other",                                107 },
+        { "Assets","Current Assets","Prepaid Income Taxes",                      108 },
+        { "Assets","Current Assets","Interest Receivable",                       109 },
+        { "Assets","Current Assets","Materials and Supplies",                    110 },
+        { "Assets","Current Assets","Prepayments",                               111 },
+
+        { "Assets","Other Noncurrent Assets","Investment in Affiliates",         121 },
+        { "Assets","Other Noncurrent Assets","Equity Method Investments",        122 },
+        { "Assets","Other Noncurrent Assets","Equity Investments",               123 },
+        { "Assets","Other Noncurrent Assets","Prepayments (Non Current)",        124 },
+        { "Assets","Other Noncurrent Assets","Deferred Charges",                 125 },
+
+        { "Assets","Property, Plant & Equipment","Telephone Plant in Service",   131 },
+        { "Assets","Property, Plant & Equipment","Internet Plant in Service",    132 },
+        { "Assets","Property, Plant & Equipment","Other Plant",                  133 },
+        { "Assets","Property, Plant & Equipment","Less Accumulated Depreciation",134 },
+        { "Assets","Property, Plant & Equipment","Plant Under Construction",     135 },
+
+        // ===== LIABILITIES =====
+        { "Liabilities","Current Liabilities","AP - Affiliates",                 201 },
+        { "Liabilities","Current Liabilities","AP - Other",                      202 },
+        { "Liabilities","Current Liabilities","Customer Deposits",               203 },
+        { "Liabilities","Current Liabilities","Other",                           204 },
+
+        { "Liabilities","Other Noncurrent Liabilities","Deferred Income Taxes",  211 },
+        { "Liabilities","Other Noncurrent Liabilities","Other",                  212 },
+
+        // ===== MEMBERS' EQUITY =====
+        { "Members' Equity","Members' Equity","Memberships",                     301 },
+        { "Members' Equity","Members' Equity","Common Stock",                    302 },
+        { "Members' Equity","Members' Equity","Patronage Capital Assigned",      303 },
+        { "Members' Equity","Members' Equity","Other Capital",                   304 },
+        { "Members' Equity","Members' Equity","Additional Paid-in Capital",      305 },
+        { "Members' Equity","Members' Equity","Accumulated Other Comprehensive Loss", 306 },
+        { "Members' Equity","Members' Equity","Margins Assignable",              307 }
+    }
+)

@@ -1,0 +1,91 @@
+FS_Meta =
+DATATABLE (
+    "Section", STRING,
+    "AuditGroup", STRING,
+    "Sort", INTEGER,
+    {
+        // ===== Balance Sheet Data =====
+        { "Balance Sheet Data", "Property, plant and equipment", 101 },
+        { "Balance Sheet Data", "Less accumulated depreciation", 102 },
+        { "Balance Sheet Data", "Net property and equipment",    103 },
+        { "Balance Sheet Data", "Investments",                   104 },
+        { "Balance Sheet Data", "Current assets",                105 },
+        { "Balance Sheet Data", "Noncurrent assets",             106 },
+        { "Balance Sheet Data", "Total assets",                  107 },
+        { "Balance Sheet Data", "Less current liabilities",      108 },
+        { "Balance Sheet Data", "Less other long-term liabilities", 109 },
+        { "Balance Sheet Data", "Equity",                        110 },
+
+        // ===== Operating Data =====
+        { "Operating Data", "Local network services",            201 },
+        { "Operating Data", "Network access services",           202 },
+        { "Operating Data", "Long distance services",            203 },
+        { "Operating Data", "Internet, sales and other services",204 },
+        { "Operating Data", "Miscellaneous",                     205 },
+        { "Operating Data", "Total operating revenues",          206 },
+        { "Operating Data", "Operating expenses",                207 },
+        { "Operating Data", "Depreciation and amortization",     208 },
+        { "Operating Data", "General taxes",                     209 },
+        { "Operating Data", "Net operating margins",             210 },
+        { "Operating Data", "Other income, net",                 211 },
+        { "Operating Data", "Income tax expense (benefit)",      212 },
+        { "Operating Data", "Net margins",                       213 },
+
+        // ===== Ratios =====
+        { "Ratios", "Net Margin Return on Average Net Telephone Plant", 301 }
+    }
+)
+
+// Helpers (per-year context)
+BS_EndOfYear :=
+DATE ( SELECTEDVALUE( tblDate[Year], MAX( tblDate[Year] ) ), 12, 31 )
+
+BS_Value_Tel :=
+VAR EndDate = [BS_EndOfYear]
+RETURN
+CALCULATE (
+    SUMX ( 'tblGL (Telephone)', 'tblGL (Telephone)'[dblDebit] - 'tblGL (Telephone)'[dblCredit] ),
+    FILTER ( ALL ( 'tblGL (Telephone)'[dtmDate] ), 'tblGL (Telephone)'[dtmDate] <= EndDate ),
+    'tblGL (Telephone)'[ysnUnposted] <> TRUE()
+);
+
+// Gross PP&E = plant in service (all lines) + construction in progress
+FS_PPE_Tel :=
+CALCULATE (
+    [BS_Value_Tel],
+    BS_Meta[AuditGroup] IN {
+        "Telephone Plant in Service","Internet Plant in Service","Plant - Other","Plant Under Construction"
+    }
+)
+
+FS_AccumDep_Tel :=
+CALCULATE ( [BS_Value_Tel], BS_Meta[AuditGroup] = "Less Accumulated Depreciation" )
+
+FS_NetPPE_Tel := [FS_PPE_Tel] - [FS_AccumDep_Tel]
+
+// Investments = Equity Method Investments + Equity Investments  (excludes “Investment in affiliates” per audit)
+FS_Investments_Tel :=
+CALCULATE (
+    [BS_Value_Tel],
+    BS_Meta[AuditGroup] IN { "Equity Method Investments","Equity Investments" }
+)
+
+// Current & Noncurrent assets (noncurrent here is Prepayments (Non Current) + Deferred Charges)
+FS_CurrentAssets_Tel :=
+CALCULATE ( [BS_Value_Tel], BS_Meta[Subsection] = "Current Assets" )
+
+FS_NoncurrentAssets_Tel :=
+CALCULATE ( [BS_Value_Tel], BS_Meta[AuditGroup] IN { "Prepayments (Non Current)","Deferred Charges" } )
+
+FS_TotalAssets_Tel :=
+CALCULATE ( [BS_Value_Tel], BS_Meta[Section] = "Assets" )
+
+// Liabilities shown positive in audit (use your display logic)
+FS_LessCurrentLiab_Tel :=
+CALCULATE ( [BS Display_Tel], BS_Meta[Subsection] = "Current Liabilities" )
+
+FS_LessOtherLongTermLiab_Tel :=
+CALCULATE ( [BS Display_Tel], BS_Meta[Subsection] = "Other Noncurrent Liabilities" )
+
+FS_Equity_Tel :=
+CALCULATE ( [BS Display_Tel], BS_Meta[Section] = "Members' Equity" )

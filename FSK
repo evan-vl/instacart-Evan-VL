@@ -147,57 +147,51 @@ SWITCH(
 
 FS Value_Consol :=
 IF (
-    ISINSCOPE( FS_Meta[AuditGroup] ),
-    SWITCH(
-        SELECTEDVALUE( FS_Meta[AuditGroup] ),
+  ISINSCOPE( FS_Meta[AuditGroup] ),
+  SWITCH(
+    SELECTEDVALUE( FS_Meta[AuditGroup] ),
+    // Balance Sheet Data
+    "Property, plant and equipment",
+      CALCULATE([BS Display_Consol],
+        BS_Meta[AuditGroup] IN {
+          "Telephone Plant in Service","Internet Plant in Service","Plant - Other","Plant Under Construction"
+        }),
+    "Less accumulated depreciation",
+      CALCULATE([BS Display_Consol], BS_Meta[AuditGroup] = "Less Accumulated Depreciation"),
+    "Net property and equipment", [FS_NetPPE_Consol],
+    "Investments",
+      CALCULATE([BS Display_Consol],
+        BS_Meta[AuditGroup] IN {"Equity Method Investments","Equity Investments"}),
+    "Current assets",        CALCULATE([BS Display_Consol], BS_Meta[Subsection] = "Current Assets"),
+    "Noncurrent assets",     CALCULATE([BS Display_Consol],
+                             BS_Meta[AuditGroup] IN {"Prepayments (Non Current)","Deferred Charges"}),
+    "Total assets",          CALCULATE([BS Display_Consol], BS_Meta[Section] = "Assets"),
+    "Less current liabilities",
+                             CALCULATE([BS Display_Consol], BS_Meta[Subsection] = "Current Liabilities"),
+    "Less other long-term liabilities",
+                             CALCULATE([BS Display_Consol], BS_Meta[Subsection] = "Other Noncurrent Liabilities"),
+    "Equity",                CALCULATE([BS Display_Consol], BS_Meta[Section] = "Members' Equity"),
 
-        // ----- Balance Sheet Data -----
-        "Property, plant and equipment",
-            CALCULATE( [BS Display_Consol],
-                BS_Meta[AuditGroup] IN {
-                    "Telephone Plant in Service","Internet Plant in Service","Plant - Other","Plant Under Construction"
-                }
-            ),
-        "Less accumulated depreciation",
-            CALCULATE( [BS Display_Consol], BS_Meta[AuditGroup] = "Less Accumulated Depreciation" ),
-        "Net property and equipment",           [FS_NetPPE_Consol],
-        "Investments",
-            CALCULATE( [BS Display_Consol],
-                BS_Meta[AuditGroup] IN { "Equity Method Investments","Equity Investments" }
-            ),
-        "Current assets",
-            CALCULATE( [BS Display_Consol], BS_Meta[Subsection] = "Current Assets" ),
-        "Noncurrent assets",
-            CALCULATE( [BS Display_Consol],
-                BS_Meta[AuditGroup] IN { "Prepayments (Non Current)","Deferred Charges" }
-            ),
-        "Total assets",
-            CALCULATE( [BS Display_Consol], BS_Meta[Section] = "Assets" ),
-        "Less current liabilities",
-            CALCULATE( [BS Display_Consol], BS_Meta[Subsection] = "Current Liabilities" ),
-        "Less other long-term liabilities",
-            CALCULATE( [BS Display_Consol], BS_Meta[Subsection] = "Other Noncurrent Liabilities" ),
-        "Equity",
-            CALCULATE( [BS Display_Consol], BS_Meta[Section] = "Members' Equity" ),
+    // Operating Data (reuse your IS consolidated measures)
+    "Local network services",             CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Local Network Services"),
+    "Network access services",            CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Network Access Services"),
+    "Long distance services",             CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Long Distance Services"),
+    "Internet, sales and other services", CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Internet, Sales and Other Services"),
+    "Miscellaneous",                      CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Miscellaneous Revenue"),
+    "Total operating revenues",           [IS Revenues_Consol],
+    "Operating expenses",                 CALCULATE([IS Base_Consol], IS_Meta[Section]="Operating Expenses",
+                                                   IS_Meta[AuditGroup]<>"Depreciation", IS_Meta[AuditGroup]<>"General Taxes"),
+    "Depreciation and amortization",      CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="Depreciation"),
+    "General taxes",                      CALCULATE([IS Base_Consol], IS_Meta[AuditGroup]="General Taxes"),
+    "Net operating margins",              [IS Operating Margin_Consol],
+    "Other income, net",                  CALCULATE([IS Base_Consol], IS_Meta[Section]="Other Income"),
+    "Income tax expense (benefit)",       [IS Income Tax_Consol],
+    "Net margins",                        [IS Net Margins_Consol],
 
-        // ----- Operating Data -----
-        "Local network services",             CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Local Network Services" ),
-        "Network access services",            CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Network Access Services" ),
-        "Long distance services",             CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Long Distance Services" ),
-        "Internet, sales and other services", CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Internet, Sales and Other Services" ),
-        "Miscellaneous",                      CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Miscellaneous Revenue" ),
-        "Total operating revenues",           [IS Revenues_Consol],
-        "Operating expenses",                 CALCULATE( [IS Base_Consol], IS_Meta[Section] = "Operating Expenses", IS_Meta[AuditGroup] <> "Depreciation", IS_Meta[AuditGroup] <> "General Taxes" ),
-        "Depreciation and amortization",      CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "Depreciation" ),
-        "General taxes",                      CALCULATE( [IS Base_Consol], IS_Meta[AuditGroup] = "General Taxes" ),
-        "Net operating margins",              [IS Operating Margin_Consol],
-        "Other income, net",                  CALCULATE( [IS Base_Consol], IS_Meta[Section] = "Other Income" ),
-        "Income tax expense (benefit)",       [IS Income Tax_Consol],
-        "Net margins",                        [IS Net Margins_Consol],
-
-        // ----- Ratio -----
-        "Net Margin Return on Average Net Telephone Plant", [FS_ReturnOnAvgNetPlant_Consol]
-    ),
-    BLANK()
+    // Ratio
+    "Net Margin Return on Average Net Telephone Plant", [FS_ReturnOnAvgNetPlant_Consol]
+  ),
+  BLANK()
 )
+
 

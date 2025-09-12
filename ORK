@@ -127,3 +127,25 @@ SWITCH (
   "Dividend and interest income - % of net margins",                   [OR_DivInt_pct_of_NetMargins]
 )
 
+
+OR
+
+OR_Value_Consol :=
+IF (
+  ISINSCOPE ( OR_Meta[AuditGroup] ),
+  SWITCH (
+    SELECTEDVALUE ( OR_Meta[AuditGroup] ),
+
+    "Total operating revenues per $1 of average gross plant in service", [OR_Revenues_per_$1_AvgPlant],
+    "Operating ratio (1)",                                               [OR_Operating_Ratio],
+    "Operating expenses per $1 of average gross plant in service",       [OR_OpEx_per_$1_AvgPlant],
+    "Margins from operations per $1 of average gross plant in service",  [OR_OpMargin_per_$1_AvgPlant],
+    "Plant specific operations - % of average gross plant in service",   [OR_PlantSpecific_pct_of_AvgPlant],
+    "Plant specific operations - % of operating revenues",               [OR_PlantSpecific_pct_of_Revenues],
+    "Depreciation - % of average gross plant in service",                [OR_Depreciation_pct_of_AvgPlant],
+    "Depreciation reserve - % of year-end plant",                        [OR_DepRes_pct_of_YE_Plant],
+    "Dividend and interest income - % of net margins",                   [OR_DivInt_pct_of_NetMargins]
+  ),
+  BLANK()
+)
+

@@ -1,0 +1,129 @@
+OR_Meta =
+DATATABLE (
+  "AuditGroup", STRING,
+  "Sort", INTEGER,
+  {
+    { "Total operating revenues per $1 of average gross plant in service", 101 },
+    { "Operating ratio (1)",                                                102 },
+    { "Operating expenses per $1 of average gross plant in service",        103 },
+    { "Margins from operations per $1 of average gross plant in service",   104 },
+    { "Plant specific operations - % of average gross plant in service",    105 },
+    { "Plant specific operations - % of operating revenues",                106 },
+    { "Depreciation - % of average gross plant in service",                 107 },
+    { "Depreciation reserve - % of year-end plant",                         108 },
+    { "Dividend and interest income - % of net margins",                    109 }
+  }
+)
+
+
+
+
+Measures
+
+
+
+
+-- Year-end gross plant (PP&E before depreciation, incl. CIP)
+BS_GrossPlant_End_Consol :=
+CALCULATE (
+    [BS_Display_Consol],
+    BS_Meta[AuditGroup] IN {
+        "Telephone Plant in Service","Internet Plant in Service","Plant - Other","Plant Under Construction"
+    }
+)
+
+-- Prior year-end gross plant (beginning of current year)
+BS_GrossPlant_Beg_Consol :=
+CALCULATE ( [BS_GrossPlant_End_Consol], DATEADD ( tblDate[Date], -1, YEAR ) )
+
+-- Average gross plant for the year
+Avg_GrossPlant_Consol :=
+DIVIDE ( [BS_GrossPlant_End_Consol] + [BS_GrossPlant_Beg_Consol], 2 )
+
+-- Accumulated Depreciation (balance sheet, year-end) for “reserve ÷ year-end plant”
+BS_AccumDep_Consol :=
+CALCULATE ( [BS_Display_Consol], BS_Meta[AuditGroup] = "Less Accumulated Depreciation" )
+
+-- Plant Specific Ops expense (IS). If you already have a measure, you can delete this wrapper.
+IS_PlantSpecific_Consol :=
+CALCULATE ( [IS_Base_Consol], IS_Meta[AuditGroup] = "Plant Specific Operations" )
+
+-- Operating expenses (exclude Depreciation & General Taxes) per footnote (1)
+IS_OpEx_NoDep_NoTax_Consol :=
+CALCULATE (
+    [IS_Base_Consol],
+    IS_Meta[Section] = "Operating Expenses",
+    IS_Meta[AuditGroup] <> "Depreciation",
+    IS_Meta[AuditGroup] <> "General Taxes"
+)
+
+-- Depreciation expense (IS). If you have IS_Depreciation_Consol already, you can use it.
+IS_Depreciation_Consol_Wrap :=
+IF (
+    ISBLANK ( [IS_Depreciation_Consol] ),
+    CALCULATE ( [IS_Base_Consol], IS_Meta[AuditGroup] = "Depreciation" ),
+    [IS_Depreciation_Consol]
+)
+
+-- Dividend + Interest Income (IS)
+IS_DividendInterest_Consol :=
+CALCULATE ( [IS_Base_Consol], IS_Meta[AuditGroup] = "Interest and Dividend Income" )
+
+
+
+Ratios
+
+-- $ per $ of average plant (decimal like 0.185)
+OR_Revenues_per_$1_AvgPlant :=
+DIVIDE ( [IS_Revenues_Consol], [Avg_GrossPlant_Consol] )
+
+-- Operating ratio = OpEx / Revenues   (uses OpEx excluding Dep & Taxes)
+OR_Operating_Ratio :=
+DIVIDE ( [IS_OpEx_NoDep_NoTax_Consol], [IS_Revenues_Consol] )
+
+-- OpEx per $1 of average plant
+OR_OpEx_per_$1_AvgPlant :=
+DIVIDE ( [IS_OpEx_NoDep_NoTax_Consol], [Avg_GrossPlant_Consol] )
+
+-- Operating margins per $1 of average plant
+OR_OpMargin_per_$1_AvgPlant :=
+DIVIDE ( [IS_Operating Margin_Consol], [Avg_GrossPlant_Consol] )
+
+-- Plant specific ops % of average plant
+OR_PlantSpecific_pct_of_AvgPlant :=
+DIVIDE ( [IS_PlantSpecific_Consol], [Avg_GrossPlant_Consol] )
+
+-- Plant specific ops % of operating revenues
+OR_PlantSpecific_pct_of_Revenues :=
+DIVIDE ( [IS_PlantSpecific_Consol], [IS_Revenues_Consol] )
+
+-- Depreciation % of average plant
+OR_Depreciation_pct_of_AvgPlant :=
+DIVIDE ( [IS_Depreciation_Consol_Wrap], [Avg_GrossPlant_Consol] )
+
+-- Depreciation reserve % of year-end plant
+OR_DepRes_pct_of_YE_Plant :=
+DIVIDE ( [BS_AccumDep_Consol], [BS_GrossPlant_End_Consol] )
+
+-- Dividend & interest income % of net margins
+OR_DivInt_pct_of_NetMargins :=
+DIVIDE ( [IS_DividendInterest_Consol], [IS_Net Margins_Consol] )
+
+
+
+Switch
+OR_Value_Consol :=
+SWITCH (
+  SELECTEDVALUE ( OR_Meta[AuditGroup] ),
+
+  "Total operating revenues per $1 of average gross plant in service", [OR_Revenues_per_$1_AvgPlant],
+  "Operating ratio (1)",                                               [OR_Operating_Ratio],
+  "Operating expenses per $1 of average gross plant in service",       [OR_OpEx_per_$1_AvgPlant],
+  "Margins from operations per $1 of average gross plant in service",  [OR_OpMargin_per_$1_AvgPlant],
+  "Plant specific operations - % of average gross plant in service",   [OR_PlantSpecific_pct_of_AvgPlant],
+  "Plant specific operations - % of operating revenues",               [OR_PlantSpecific_pct_of_Revenues],
+  "Depreciation - % of average gross plant in service",                [OR_Depreciation_pct_of_AvgPlant],
+  "Depreciation reserve - % of year-end plant",                        [OR_DepRes_pct_of_YE_Plant],
+  "Dividend and interest income - % of net margins",                   [OR_DivInt_pct_of_NetMargins]
+)
+
